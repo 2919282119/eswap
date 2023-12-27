@@ -10,8 +10,9 @@ export const useUserStore = defineStore("userStore", () => {
         phoneno: "",
         avater: "https://pic4.zhimg.com/80/v2-2189b7ca8f3a68eedf7f016fb0a9786b_1440w.webp"
     })
+    const allUsers=reactive([])
     const goLogin = () => {
         router.push("/login");
     }
-    return { userInfo, goLogin };
+    return { userInfo,allUsers, goLogin };
 });

@@ -17,11 +17,13 @@ import Sell from "@/components/E-swap/post/Sell.vue";
 import PostWall from "@/components/E-swap/post/PostWall.vue";
 import AskBuy from "@/components/E-swap/post/AskBuy.vue";
 import PassRiver from "@/components/Test/PassRiver.vue";
+import Chat from "@/components/E-swap/message/Chat.vue";
 
 const routes=[
     {path:"/",component:Content,children:[//这里只要嵌套路由，父路由必须是一个只含<RouterView/>的vue组件
         {path:"",redirect:"/login"},
         {path:"index",component:Index},
+        {path:"index/:category",name:"index-s",component:Index},
         {path:"campus",component:Campus},
         {path:"post",component:Post},
         {path:"message",component:Message},
@@ -37,7 +39,8 @@ const routes=[
     {path:"/sell",component:Sell},
     {path:"/bbwall",component:PostWall},
     {path:"/askbuy",component:AskBuy},
-    {path:"/passriver",component:PassRiver}
+    {path:"/passriver",component:PassRiver},
+    {path:"/chat/:item",name:"chat",component:Chat}
 ]
 
 const router = createRouter({

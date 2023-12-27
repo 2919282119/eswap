@@ -2,69 +2,28 @@
 import { useCartStore } from "@/stores/useCartStore"
 import { LeftOutlined, DeleteOutlined } from "@ant-design/icons-vue"
 import { onMounted, onUpdated, reactive, watch, computed } from "vue";
+import CartItem from "./CartItem.vue";
 import router from "../../../router";
 import Counter from "./Counter.vue"
 const cartStore = useCartStore();
-const state = reactive({
-    cartList: []
-})
-onMounted(() => {
-    getCartList();
-})
-const getCartList = () => {
-    cartStore.state.cart.map(item => {
-        const listids = state.cartList.map(item3 => item3.id);
-        if (!listids.includes(item.id)) {
-            state.cartList.push({ ...item, count: 1 });
-        } else {
-            let targetIndex = listids.indexOf(item.id);//原本这里写成了cartList.indexOf(item)太傻比了,item是没有count属性的
-            state.cartList[targetIndex].count++;
-        }
-
-    });
-
-}
 
 const goBack = () => {
     router.go(-1);
 }
 const clearCart = () => {
     cartStore.clearCart();
-    state.cartList.splice(0);
 }
 
-
-const editCartList = (item, flag) => {
-    if (flag == 1) {
-        const listids = state.cartList.map(item3 => item3.id);
-        if (!listids.includes(item.id)) {
-            state.cartList.push({ ...item, count: 1 });
-        } else {
-            let targetIndex = listids.indexOf(item.id);//原本这里写成了cartList.indexOf(item)太傻比了,item是没有count属性的
-            state.cartList[targetIndex].count++;
-        }
-    } else {
-        const listids = state.cartList.map(item3 => item3.id);
-        if (listids.includes(item.id)) {
-            let targetIndex = listids.indexOf(item.id);
-            state.cartList[targetIndex].count--;
-        }
-    }
-}
 const addToCart = (item) => {
     cartStore.addToCart(item);
-    editCartList(item, 1)
 }
 const removeFromCart = (item) => {
     cartStore.removeFromCart(item.id);//记住一定要根据id删
-    editCartList(item, -1)
 }
 const goIndex = () => {
     router.push('/index');
 }
-// watch(state.cartList, (newValue, oldValue) => {
-//     console.log(newValue, 99999);
-// })
+
 </script>
 
 <template>
@@ -75,14 +34,14 @@ const goIndex = () => {
             <DeleteOutlined class="clearcart" @click="clearCart" />
         </div>
         <div class="items">
-            <a-empty v-if="cartStore.state.cart.length==0" class="emptyCart">
+            <a-empty v-if="cartStore.state.aggCart.length==0" class="emptyCart">
                 <template #description>
                     购物车空空如也，快去选购吧
                 </template>
                 <a-button type="primary" @click="goIndex">去选购</a-button>
             </a-empty>
-            <div class="cartItem" v-for="item of state.cartList">
-                <div class="itemcontent" v-show="item.count != 0">
+            <div class="cartItem" v-for="item of cartStore.state.aggCart">
+                <!-- <div class="itemcontent" v-show="item.count != 0">
                     <div class="left">
                         <div class="img">
                             <img v-lazy="item.image" />
@@ -106,9 +65,9 @@ const goIndex = () => {
                     <div class="operation">
                         <Counter :count="item.count" @do-add="addToCart(item)" @do-minus="removeFromCart(item)" />
                     </div>
-                </div>
+                </div> -->
+                <CartItem :item="item"></CartItem>
             </div>
-            <!-- <div class="sum" v-show="state.cartList.length!=0">这样看来通过数组下标来修改确实非响应 -->
             <div class="total" v-show="cartStore.sumMoney!=0">
                 总计：{{ cartStore.sumMoney }}元
                 <a-button class="goPay" size="large">去结算</a-button>

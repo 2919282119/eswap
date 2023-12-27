@@ -22,10 +22,10 @@ let state = reactive({
 })
 const getUsers = async () => {
     let p = {};
-    p.selectsql = "select userid,username,password,phoneno,userstatus from users";
+    p.selectsql = "select userid,username,password,phoneno,userstatus,avater from users";
     doQuery(p).then(res => {
-        state.data.splice(0);
-        state.data.push(...res.data);
+        state.data=[...res.data];
+        userStore.allUsers = [...res.data];
     });
 }
 const checkNoEmpty = () => {

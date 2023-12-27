@@ -5,8 +5,7 @@ export const useCommodityStore = defineStore('commodity', () => {
   const state=reactive({
     commodityList:[],
     categories:[],
-    categorytree:[],
-    allCommodity:[]
+    categorytree:[]
   })
   return {
     state

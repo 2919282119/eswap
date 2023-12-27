@@ -52,7 +52,7 @@ const goClassify=()=>{
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: 0.5em;
+    margin-top: 1vh;
 }
 
 .searchbar {

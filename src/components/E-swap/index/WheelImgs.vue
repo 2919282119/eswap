@@ -53,6 +53,6 @@ img {
     height: v-bind(height);
     @media @desktop {
         height: @desktopheight;
-    }
+    }   
 }
 </style>

@@ -7,10 +7,10 @@ import Capsule from "./Capsule.vue";
 import { CloseOutlined, AimOutlined } from "@ant-design/icons-vue"
 import { useCommodityStore } from "@/stores/useCommodityStore"
 import { doQuery } from "@/functions/mysql"
-import { useRouter,useRoute } from "vue-router"
+import { useRouter, useRoute } from "vue-router"
 import Location from "./Location.vue";
 const router = useRouter()
-const route=useRoute();
+const route = useRoute();
 const commodityStore = useCommodityStore()
 
 const state = reactive({
@@ -39,34 +39,26 @@ const kkitems = [
 ]
 
 
-const hobbyitems = ["拉杆箱", "手机", "牛奶", "+"];
-const searchByCategory=async ()=>{
-    // if(route.query.category){
-    //     state.cimgs=commodityStore.state.allCommodity.filter(item=>item.category.includes(route.query.category));
-    // }
+const hobbyitems = ["毛呢大衣", "毛衣", "新品", "+"];
+const searchByCategory = async () => {
+    if(route.query.category){
+        state.cimgs=commodityStore.state.commodityList.filter(item=>item.category.includes(route.query.category));
+    }
 }
-const getAllCommodity=async()=>{
-    let p={};
-    p.selectsql="select * from commodity2";
-    await doQuery(p).then(res=>{
-        commodityStore.state.allCommodity=res.data;
-        console.log(commodityStore.state.allCommodity);
-    })
-}
+
 onMounted(async () => {
-    
+
     if (commodityStore.state.commodityList.length == 0) {
         await getCommoditys();
         state.xcimgs = state.cimgs;
-        // await getAllCommodity();
     } else {
         state.cimgs = state.xcimgs = commodityStore.state.commodityList;
     }
-    // await searchByCategory();
+    await searchByCategory();
 })
 const getCommoditys = async () => {
     let p = {};
-    p.selectsql = "select id,name,price,image,category,brand,userid,avater from commodity2 order by rowno desc limit 100";
+    p.selectsql = "select id,name,price,image,category,brand,userid,avater from commodity2 order by rowno limit 100";
     await doQuery(p).then((res) => {
         state.cimgs = [...res.data];
         commodityStore.state.commodityList = [...res.data];
@@ -116,7 +108,7 @@ const deletexTag = (type, tag) => {
                 </Capsule>
             </div>
             <div class="recommend">
-                <RouterLink class="card" v-for="item of state.cimgs" :to="{ path: 'details', query: { cid: item.id } }">
+                <RouterLink class="card" v-for="item of state.cimgs" :to="{ path: '/details', query: { cid: item.id } }">
                     <img class="cimg" v-lazy="item.image" />
                     <Location width="38vw" fontsize="0.3em" class="location">
                         <template #address>
@@ -144,12 +136,12 @@ const deletexTag = (type, tag) => {
     </div>
     <a-drawer title="我的频道" class="tagDrawer" placement="bottom" height="90vh" :open="state.showTags"
         @close="state.showTags = false">
-        <div class="xtagBody">
+        <div class="xtagBody"> 
             <div class="xtag" v-for="item of state.xtags" @click="deletexTag(1, item)">
                 {{ item }}
                 <a-divider type="vertical" />
                 <CloseOutlined />
-            </div>
+            </div> 
         </div>
         <a-tabs>
             <a-tab-pane key="x1" tab="为您推荐">
@@ -219,8 +211,9 @@ const deletexTag = (type, tag) => {
 
 .scrollPart {
     width: 100vw;
-    height: 78.2vh;
+    height: 79vh;
     overflow-y: scroll;
+    overflow-x: hidden;
 }
 
 
@@ -276,44 +269,6 @@ const deletexTag = (type, tag) => {
     margin-right: 0.2em;
 }
 
-.card {
-    .basecard{
-        margin: 0.5em 0;
-        box-shadow: 0 0 0.5em #ddd;
-        border-radius: 0.5em;
-        overflow: hidden;
-        color: #000;
-        text-decoration: none;
-    }
-    @media @desktop {
-        width: 18vw;
-        .basecard();
-    }
-
-    @media @mobile {
-        width: 45vw;
-        .basecard();
-    }
-    @media @tablet {
-        width:18vw;
-        .basecard();
-    }
-
-}
-
-.cimg img {
-    @media @desktop {
-        width: 18vw;
-    }
-
-    @media @mobile {
-        width: 45vw;
-    }
-    @media @tablet {
-        width:18vw;
-    }
-}
-
 .desc {
     height: 2.8em;
     overflow: hidden;
@@ -331,14 +286,24 @@ const deletexTag = (type, tag) => {
     padding: 0 3vw;
     height: 7vh;
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     justify-content: space-around;
     align-items: center;
 }
 
 .recommend {
     width: 100vw;
-    display: flex;
-    justify-content: space-around;
-    flex-wrap: wrap;
-}</style>
+    padding:1em;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap:1em;
+}
+
+.card {
+    box-shadow: 0 0 0.5em #ddd;
+    border-radius: 0.5em;
+    overflow: hidden;
+    color: #000;
+    text-decoration: none;
+}
+</style>

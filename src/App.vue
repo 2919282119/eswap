@@ -1,9 +1,8 @@
 <script setup>
-import { onMounted, reactive, ref } from "vue"
+import { onMounted, reactive, ref,computed } from "vue"
 import Eswap from "@/components/Eswap.vue";
 import { doFileDownload } from "@/functions/file.js";
 import { doAliQuery } from "./functions/ai/ali";
-
 </script>
 
 <template>

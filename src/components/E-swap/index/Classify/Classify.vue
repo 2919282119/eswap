@@ -118,6 +118,7 @@ watch(() => state.selectLevel2ID, () => {
 
 const clickItem=(item)=>{
     state.selectLevel3ID = item.id;
+    // router.push({name:"index-s",params:{category:item.text}});
     router.push({path:"/index",query:{category:item.text}});
 }
 

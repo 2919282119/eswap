@@ -1,16 +1,17 @@
 <script setup>
 import { onMounted, reactive } from 'vue';
-import { BackwardOutlined, PlusOutlined, MinusOutlined, LeftOutlined, MoreOutlined, ShoppingCartOutlined } from "@ant-design/icons-vue"
+import { BackwardOutlined, PlusOutlined, StarOutlined, StarFilled, LeftOutlined, MoreOutlined, ShoppingCartOutlined } from "@ant-design/icons-vue"
 import { useRoute, useRouter } from 'vue-router'
-import {message} from "ant-design-vue";
+import { message } from "ant-design-vue";
 import { useCommodityStore } from '@/stores/useCommodityStore';
 import { useCartStore } from "@/stores/useCartStore"
+import CartItem from './CartItem.vue';
 const route = useRoute();
 const router = useRouter();
 const commodityStore = useCommodityStore();
 const cartStore = useCartStore();
 message.config({
-    top:"40vh"
+    top: "40vh"
 });
 
 const state = reactive({
@@ -25,10 +26,12 @@ const state = reactive({
         category: ""
     },
     count: 0,
-    isFocus:false
+    isFocus: false,
+    directBuy: false,
+    iscollected: false
 })
 onMounted(() => {
-    state.currentCommodity = filterCommodity();//这样赋值会不会变成非响应式的
+    state.currentCommodity = filterCommodity();
     initCount();
 })
 const filterCommodity = () => {
@@ -42,7 +45,7 @@ const goCart = () => {
 }
 const delincart = () => {
     state.count--;
-    cartStore.removeFromCart(state.currentCommodity);
+    cartStore.removeFromCart(state.currentCommodity.id);
 }
 const addincart = () => {
     state.count++;
@@ -52,12 +55,24 @@ const initCount = () => {
     state.count = cartStore.getCommodityCount(state.currentCommodity.id);
 }
 const doFocusUser = () => {
-    state.isFocus=!state.isFocus;
+    state.isFocus = !state.isFocus;
     message.success("关注成功");
 }
 const donFocusUser = () => {
-    state.isFocus=!state.isFocus;
+    state.isFocus = !state.isFocus;
     message.info("已取消关注");
+}
+const goChat = () => {
+    router.push({ name: "chat", params: { item: JSON.stringify(state.currentCommodity) } });
+}
+const collect=(flag)=>{
+    if(flag==1){
+        state.iscollected=true;
+        message.success("收藏成功");
+    }else{
+        state.iscollected=false;
+        message.info("已取消收藏");
+    }
 }
 </script>
 
@@ -112,34 +127,44 @@ const donFocusUser = () => {
             </div>
         </div>
         <div class="operations">
-            <div class="op-btns">
-                <a-button class="btns" @click="delincart" :disabled="state.count<=0">
-                    <template #icon>
-                        <MinusOutlined />
-                    </template>
-                </a-button>
-                <span class="count">{{ state.count }}</span>
-                <a-button class="btns" type="primary" @click="addincart">
-                    <template #icon>
-                        <PlusOutlined />
-                    </template>
-                </a-button>
+            <div class="collect">
+                <div v-if="!state.iscollected" @click="collect(1)">
+                    <StarOutlined class="collect-icon" />
+                    &nbsp;收藏
+                </div>
+                <div v-else @click="collect(-1)">
+                    <StarFilled class="collect-icon2" />
+                    &nbsp;已收藏
+                </div>
+
+            </div>
+            <div class="buyorchat">
+                <a-button-group>
+                    <a-button size="large" @click="goChat">去聊聊</a-button>
+                    <a-button size="large" type="primary" @click="state.directBuy = true">直接买</a-button>
+                </a-button-group>
             </div>
         </div>
 
     </div>
+    <a-drawer title="直接购买" class="directBuy" placement="bottom" height="40vh" :open="state.directBuy"
+        @close="state.directBuy = false">
+        <CartItem :item="state.currentCommodity"></CartItem>
+    </a-drawer>
 </template>
 
 <style scoped lang="less">
-.classify{
+.classify {
     text-decoration: none;
 }
+
 .userinfo {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 0 1em;
-    .username{
+
+    .username {
         margin-left: 0.5em;
     }
 }
@@ -150,12 +175,15 @@ const donFocusUser = () => {
     font-weight: 600;
     border: none;
 }
-.focusbtn1{
+
+.focusbtn1 {
     .focusbtn();
-    color:rgb(43, 42, 42)}
-.focusbtn2{
+    color: rgb(43, 42, 42)
+}
+
+.focusbtn2 {
     .focusbtn();
-    color:#858383
+    color: #858383
 }
 
 .nums {
@@ -196,13 +224,27 @@ const donFocusUser = () => {
 
 .operations {
     position: absolute;
-    bottom: 12vh;
+    bottom: 11vh;
     width: 100vw;
     height: 10vh;
-    background-color: #a0e9ff;
+    background-color: #ffffff;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
+    padding: 0 1em;
+
+    .collect {
+        display: flex;
+        align-items: center;
+    }
+
+    .collect-icon(@color:#000) {
+        font-size: 1.2em;
+        color:@color;
+    }
+    .collect-icon2{
+        .collect-icon(#227ddf);
+    }
 
     .op-btns {
         display: flex;
