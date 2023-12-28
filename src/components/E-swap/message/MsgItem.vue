@@ -1,14 +1,36 @@
 <script setup>
-const props=defineProps(["no"])
+import {useRouter} from "vue-router"
+const router=useRouter()
+const props=defineProps({
+    user:{
+        type:Object,
+        default:()=>({})
+    },
+    commodity:{
+        type:Object,
+        default:()=>({})
+    },
+    dialogList:{
+        type:Array,
+        default:()=>[]
+    },
+    date:{
+        type:Date,
+        default:""
+    }
+})
+const goChat=()=>{
+    router.push({name:"chat",params:{item:JSON.stringify(props.commodity),dialogList:JSON.stringify(props.dialogList)}})
+}
 </script>
 
 <template>
-    <div class="msgitem">
+    <div class="msgitem" @click="goChat">
         <div class="avatar">
             <a-badge dot>
                 <a-avatar size="large">
                     <template #icon>
-                        <img v-lazy="'https://afly0321.oss-cn-hangzhou.aliyuncs.com/img/ikun.png'" />
+                        <img v-lazy="user.avater" />
                     </template>
                 </a-avatar>
             </a-badge>
@@ -16,17 +38,17 @@ const props=defineProps(["no"])
         </div>
         <div class="content">
             <div class="username">
-                ikun{{props.no}}号
+                {{ user.username }}
             </div>
             <div class="text">
-                胶皮是狂飙和G888，刚买了不到2个月，便宜出给你
+                {{ commodity.name }}
             </div>
             <div class="msgtime">
-                23-10-11
+                {{ date.toLocaleString("zh",{"dateStyle":"short"}) }}
             </div>
         </div>
         <div class="img">
-            <img v-lazy="'https://afly0321.oss-cn-hangzhou.aliyuncs.com/img/dragon2.png'" />
+            <img v-lazy="props.commodity.image" />
         </div>
     </div>
 </template>

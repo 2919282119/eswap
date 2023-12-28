@@ -1,6 +1,8 @@
 <script setup>
 import { SettingOutlined, SearchOutlined } from "@ant-design/icons-vue"
 import MsgItem from "./MsgItem.vue"
+import { useMsgStore } from "../../../stores/useMsgStore";
+const msgStore = useMsgStore();
 </script>
 
 <template>
@@ -21,7 +23,8 @@ import MsgItem from "./MsgItem.vue"
             </a-input>
         </div>
         <div class="msglist">
-            <MsgItem v-for="(item,index) of new Array(30).fill(0)" :no="index+1"/>
+            <MsgItem v-for="item of msgStore.state.msgList" v-bind="item"/>
+            <a-result v-if="msgStore.state.msgList.length==0" status="404" title="没有聊天记录" sub-title="快去和商家聊聊吧"></a-result>
         </div>
     </div>
 </template>

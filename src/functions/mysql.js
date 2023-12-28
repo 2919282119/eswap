@@ -1,6 +1,6 @@
 import axios from "axios";
 // const preurl="http://127.0.0.1:8998/myweb3/";
-const preurl="http://47.113.205.105/myweb3/";
+const preurl="http://47.113.205.105:8080/myweb3/";
 export const doQuery=async (params)=>{
     let xparams=JSON.stringify(params);
     let url=preurl+"doQueryServlet?paramvalues="+encodeURIComponent(xparams);

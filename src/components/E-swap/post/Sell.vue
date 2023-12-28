@@ -157,7 +157,7 @@ const beforeUpload = file => {
             <div class="img">
                 <a-input placeholder="输入图片的url" allowClear v-model:value="state.formdata.imgUrl" />
                 <!-- <a-upload v-model:file-list="state.fileList" list-type="picture-card" class="uploader"
-                    :show-upload-list="false" action="http://47.113.205.105/myweb3/doUploadServlet"
+                    :show-upload-list="false" action="http://47.113.205.105:8080/myweb3/doUploadServlet"
                     :before-upload="beforeUpload" @change="handleChange">
                     <img v-if="state.previewImgUrl" class="previewImg" :src="state.formdata.imgUrl" alt="avatar" />
                     <div v-else>

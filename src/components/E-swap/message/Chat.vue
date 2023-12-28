@@ -1,10 +1,12 @@
 <script setup>
-import { reactive, onMounted } from "vue";
+import { reactive, onMounted,onUnmounted } from "vue";
 import CartItem from "./../index/CartItem.vue";
 import {myGPT2} from "@/functions/ai/openai"
 import { useUserStore } from "../../../stores/userStore";
+import { useMsgStore } from '../../../stores/useMsgStore';
 import { LeftOutlined, SettingOutlined, AudioOutlined, SmileFilled, SmileOutlined } from "@ant-design/icons-vue"
 import { useRoute, useRouter } from "vue-router";
+const msgStore = useMsgStore();
 const route = useRoute();
 const router = useRouter();
 const userStore = useUserStore();
@@ -17,10 +19,16 @@ const state = reactive({
 const goBack = () => {
     router.go(-1);
 }
+const loadDialog=()=>{
+    const dialogList=JSON.parse(route.params?.dialogList??"[]");
+    if(dialogList){
+        state.dialogList=dialogList;
+    }
+}
 onMounted(() => {
+    loadDialog();
     state.item = JSON.parse(route.params.item);
     state.user = userStore.allUsers.find(item => item.userid == state.item.userid);
-    console.log(state);
 })
 const sendmsg = async (e) => {
     if (e.keyCode == 13) {
@@ -34,8 +42,12 @@ const sendmsg = async (e) => {
             state.dialogList.push({text:res.data.choices[0].message.content,type:"A"});
         })
     }
-
 }
+onUnmounted(() => {
+    if(state.dialogList.length>0){
+        msgStore.addChat(state.user,state.item,state.dialogList,new Date());
+    }
+})
 
 </script>
 
@@ -146,4 +158,5 @@ const sendmsg = async (e) => {
     width: 100vw;
     background-color: @chatgray;
     padding: 0.5em 5vw;
-}</style>
+}
+</style>

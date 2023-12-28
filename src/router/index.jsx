@@ -40,7 +40,7 @@ const routes=[
     {path:"/bbwall",component:PostWall},
     {path:"/askbuy",component:AskBuy},
     {path:"/passriver",component:PassRiver},
-    {path:"/chat/:item",name:"chat",component:Chat}
+    {path:"/chat/:item/:dialogList",name:"chat",component:Chat}
 ]
 
 const router = createRouter({

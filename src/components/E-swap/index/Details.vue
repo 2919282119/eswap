@@ -63,7 +63,7 @@ const donFocusUser = () => {
     message.info("已取消关注");
 }
 const goChat = () => {
-    router.push({ name: "chat", params: { item: JSON.stringify(state.currentCommodity) } });
+    router.push({ name: "chat", params: { item: JSON.stringify(state.currentCommodity),dialogList:"[]" } });
 }
 const collect=(flag)=>{
     if(flag==1){
