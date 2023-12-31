@@ -82,13 +82,11 @@ const doPostSell = async () => {
         p.category = state.formdata.selectType ?? "";
         p.brand = state.formdata.brand ?? "";
         p.userid = userStore.userInfo.userid ?? "";
-        p.avater = userStore.userInfo.avater ?? "";
         commodityStore.state.commodityList.unshift(p);
         await doUpdate(p);
         resetForm();
         message.success("发布成功!");
         router.push("/index");
-        confetti.addConfetti();
     }
 
 

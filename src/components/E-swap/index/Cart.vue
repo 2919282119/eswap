@@ -23,7 +23,9 @@ const removeFromCart = (item) => {
 const goIndex = () => {
     router.push('/index');
 }
-
+const goSummary=()=>{
+    router.push('/conclude');
+}
 </script>
 
 <template>
@@ -66,11 +68,11 @@ const goIndex = () => {
                         <Counter :count="item.count" @do-add="addToCart(item)" @do-minus="removeFromCart(item)" />
                     </div>
                 </div> -->
-                <CartItem :item="item"></CartItem>
+                <CartItem :item="item" :operable="true"></CartItem>
             </div>
             <div class="total" v-show="cartStore.sumMoney!=0">
                 总计：{{ cartStore.sumMoney }}元
-                <a-button class="goPay" size="large">去结算</a-button>
+                <a-button class="goPay" size="large" @click="goSummary">去结算</a-button>
             </div>
         </div>
 

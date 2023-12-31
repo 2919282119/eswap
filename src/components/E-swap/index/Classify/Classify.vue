@@ -19,7 +19,9 @@ const state = reactive({
     searchText: "",
     searchedLevel: {},
     searchedLevelIndex: -1,
-    allSearchedLevels: []
+    allSearchedLevels: [],
+    suggestLevels: [],
+    suggestionsShow: false
 })
 onMounted(async () => {
     if (commodityStore.state.categories.length == 0) {
@@ -115,6 +117,17 @@ const getLevel3 = async () => {
 watch(() => state.selectLevel2ID, () => {
     selectLevel2();
 })
+watch(() => state.searchText, () => {
+    if(state.searchText.length>0){
+        var suggestionsList = state.alllevel.filter((level) => level.text.includes(state.searchText));
+        const res = new Map();
+        state.suggestLevels = suggestionsList.filter((level) => !res.has(level.text) && res.set(level.text, 1));
+        state.suggestionsShow = true;
+    }else{
+        state.suggestLevels = [];
+        state.suggestionsShow = false;
+    }
+})
 
 const clickItem=(item)=>{
     state.selectLevel3ID = item.id;
@@ -153,25 +166,30 @@ const targetSelect = async (targetLevel) => {
     }
 }
 const searchKind = async () => {
-    const filterLevel = state.alllevel.filter((item) => item.text.includes(state.searchText));
-    state.allSearchedLevels = [...filterLevel];
-    var targetLevel = {};
-    if (filterLevel.length > 0) {
-        filterLevel.forEach((level, index) => {
-            if (level.text == state.searchText) {
-                targetLevel = { ...level };
-                state.searchedLevelIndex = index;
+    state.searchText = state.searchText.trim();
+    if(state.searchText.length > 0){
+        const filterLevel = state.alllevel.filter((item) => item.text.includes(state.searchText));
+        state.allSearchedLevels = [...filterLevel];
+        var targetLevel = {};
+        if (filterLevel.length > 0) {
+            filterLevel.forEach((level, index) => {
+                if (level.text == state.searchText) {
+                    targetLevel = { ...level };
+                    state.searchedLevelIndex = index;
+                }
+            })
+            if (Object.keys(targetLevel).length == 0) {
+                targetLevel = filterLevel[filterLevel.length - 1];
+                state.searchedLevelIndex = filterLevel.length - 1;
             }
-        })
-        if (Object.keys(targetLevel).length == 0) {
-            targetLevel = filterLevel[filterLevel.length - 1];
-            state.searchedLevelIndex = filterLevel.length - 1;
+            targetSelect(targetLevel);
+            state.suggestionsShow = false;
+        } else {
+            message.warning("没有找到商品类别");
         }
-        targetSelect(targetLevel);
-    } else {
-        message.warning("没有找到商品类别");
+    }else{
+        message.warning("请输入内容后搜索");
     }
-
 }
 const prevLevel = () => {
     if (state.searchedLevelIndex > 0) {
@@ -187,6 +205,27 @@ const nextLevel = () => {
         targetSelect(targetLevel);
     }
 }
+const keyColorShow = (text, keyword) => {
+    if(text != "" && keyword != ""){
+        const otherTextArr = text.split(keyword);
+        var r = '';
+        otherTextArr.forEach((words, index) => {
+            if(index != otherTextArr.length-1){
+                r += '<span>'+words+'</span>'+'<span style="color: orange">'+keyword+'</span>';
+            }else{
+                r += '<span>'+words+'</span>';
+            }
+        }) 
+        return r;
+    }
+}
+const clickSuggestion = (text) => {
+    state.searchText = text;
+    setTimeout(() => {
+        searchKind();
+    }, 100)
+}
+
 
 
 </script>
@@ -208,10 +247,17 @@ const nextLevel = () => {
             <div class="closebtn">
                 <CloseOutlined @click="toBaseType" />
             </div>
-            
-            <a-input-search ref="searchBox" size="large" class="searchbox" v-model:value="state.searchText"
+            <div style="height: 2.5rem;display: flex;flex-direction: column; justify-content: safe;" direction="vertical">
+                <a-input-search ref="searchBox" size="large" class="searchbox" v-model:value="state.searchText"
                     placeholder="输入您想搜索的类别" allowClear enter-button @search="searchKind" />
-
+                <a-list v-show="state.suggestionsShow" style="z-index: 999;" :data-source="state.suggestLevels">
+                    <template #renderItem="{ item }">
+                        <a-list-item @click="clickSuggestion(item.text)" style="height: 16px;background-color: #fff;" >
+                            <a-space><SearchOutlined /><span v-html="keyColorShow(item.text, state.searchText)"></span></a-space>
+                        </a-list-item>
+                    </template>
+                </a-list>       
+            </div>
             <a-button-group class="shiftBtns">
                 <a-button type="primary" size="small" @click="prevLevel"
                     :disabled="state.searchedLevelIndex <= 0">
@@ -257,7 +303,6 @@ const nextLevel = () => {
                     </a-tabs>
                 </div>
                 <div class="tcontent">
-
                 </div>
             </div>
         </div>

@@ -1,15 +1,18 @@
 <script setup>
-import { onMounted, reactive } from 'vue';
+import { computed, onMounted, reactive } from 'vue';
 import { BackwardOutlined, PlusOutlined, StarOutlined, StarFilled, LeftOutlined, MoreOutlined, ShoppingCartOutlined } from "@ant-design/icons-vue"
 import { useRoute, useRouter } from 'vue-router'
 import { message } from "ant-design-vue";
 import { useCommodityStore } from '@/stores/useCommodityStore';
 import { useCartStore } from "@/stores/useCartStore"
+import { useUserStore } from "@/stores/userStore"
 import CartItem from './CartItem.vue';
+import { doUpdate } from '../../../functions/mysql';
 const route = useRoute();
 const router = useRouter();
 const commodityStore = useCommodityStore();
 const cartStore = useCartStore();
+const userStore = useUserStore();
 message.config({
     top: "40vh"
 });
@@ -28,12 +31,23 @@ const state = reactive({
     count: 0,
     isFocus: false,
     directBuy: false,
-    iscollected: false
+    iscollected: false,
 })
 onMounted(() => {
     state.currentCommodity = filterCommodity();
     initCount();
+    initFollow();
+    historyScanAdd();
 })
+const historyScanAdd=()=>{
+    if(!userStore.historyScan.find(item=>item.id==state.currentCommodity.id)){
+        userStore.historyScan.push(state.currentCommodity);
+    }
+}
+const initFollow = () => {
+    state.isFocus=userStore.userInfo.focus.includes(state.currentCommodity.userid);
+    state.iscollected=userStore.userInfo.collection.includes(state.currentCommodity.id);
+}
 const filterCommodity = () => {
     return commodityStore.state.commodityList.filter(item => item.id == route.query.cid)?.[0];
 }
@@ -54,23 +68,44 @@ const addincart = () => {
 const initCount = () => {
     state.count = cartStore.getCommodityCount(state.currentCommodity.id);
 }
-const doFocusUser = () => {
+const doFocusUser = async () => {
     state.isFocus = !state.isFocus;
     message.success("关注成功");
+    userStore.userInfo.focus.push(state.currentCommodity.userid);
+
+    // const targetuser=userStore.allUsers.find(item=>item.userid==state.currentCommodity.userid)
+    // targetuser.fans.push(userStore.userInfo.userid);
+    // const newfocus = JSON.stringify(userStore.userInfo.focus);
+    // const newfans = JSON.stringify(targetuser.fans);
+    // let p = {};
+    // p.sqlprocedure = "demox0010";
+    // p.focus=newfocus;
+    // p.fans=newfans;
+    // p.fid1=userStore.userInfo.userid;
+    // p.fid2=state.currentCommodity.userid;
+    // await doUpdate(p);
 }
 const donFocusUser = () => {
     state.isFocus = !state.isFocus;
     message.info("已取消关注");
 }
 const goChat = () => {
-    router.push({ name: "chat", params: { item: JSON.stringify(state.currentCommodity),dialogList:"[]" } });
+    router.push({ name: "chat", params: { item: JSON.stringify(state.currentCommodity), dialogList: "[]" } });
 }
-const collect=(flag)=>{
-    if(flag==1){
-        state.iscollected=true;
+const collect = async (flag) => {
+    if (flag == 1) {
+        state.iscollected = true;
         message.success("收藏成功");
-    }else{
-        state.iscollected=false;
+
+        userStore.userInfo.collection.push(state.currentCommodity.id);
+        // const newCollection = JSON.stringify(userStore.userInfo.collection);
+        // let p = {};
+        // p.sqlprocedure = "demox009";
+        // p.userid=userStore.userInfo.userid;
+        // p.collection=newCollection;
+        // await doUpdate(p);
+    } else {
+        state.iscollected = false;
         message.info("已取消收藏");
     }
 }
@@ -149,7 +184,7 @@ const collect=(flag)=>{
     </div>
     <a-drawer title="直接购买" class="directBuy" placement="bottom" height="40vh" :open="state.directBuy"
         @close="state.directBuy = false">
-        <CartItem :item="state.currentCommodity"></CartItem>
+        <CartItem :item="state.currentCommodity" :operable="true"></CartItem>
     </a-drawer>
 </template>
 
@@ -238,11 +273,12 @@ const collect=(flag)=>{
         align-items: center;
     }
 
-    .collect-icon(@color:#000) {
+    .collect-icon(@color: #000) {
         font-size: 1.2em;
-        color:@color;
+        color: @color;
     }
-    .collect-icon2{
+
+    .collect-icon2 {
         .collect-icon(#227ddf);
     }
 
@@ -298,4 +334,5 @@ const collect=(flag)=>{
             }
         }
     }
-}</style>
+}
+</style>

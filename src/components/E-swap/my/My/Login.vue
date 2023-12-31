@@ -22,10 +22,19 @@ let state = reactive({
 })
 const getUsers = async () => {
     let p = {};
-    p.selectsql = "select userid,username,password,phoneno,userstatus,avater from users";
+    p.selectsql = "select userid,username,password,phoneno,userstatus,avater,collection,focus,fans from users";
+
     doQuery(p).then(res => {
-        state.data=[...res.data];
-        userStore.allUsers = [...res.data];
+        const parseUsers=[...res.data].map(item=>{ //这里获取数据最好定义为store里面的方法
+            return {
+                ...item,
+                collection:item.collection?JSON.parse(item.collection):[],
+                focus:item.focus?JSON.parse(item.focus):[],
+                fans:item.fans?JSON.parse(item.fans):[]
+            }
+        });
+        state.data = parseUsers
+        userStore.allUsers = parseUsers;
     });
 }
 const checkNoEmpty = () => {
@@ -76,13 +85,17 @@ const doLogin = async () => {
         userStore.userInfo.username = matchone.username;
         userStore.userInfo.password = matchone.password;
         userStore.userInfo.phoneno = matchone.phoneno;
+        userStore.userInfo.avater = matchone.avater;
+        userStore.userInfo.collection = matchone.collection;
+        userStore.userInfo.focus = matchone.focus;
+        userStore.userInfo.fans = matchone.fans;
         showLoginResult(matchone);
         router.push("/index")
     }
 }
-const proxy=getCurrentInstance().proxy
+const proxy = getCurrentInstance().proxy
 const showLoginResult = (matchone) => {
-    
+
     if (matchone.userstatus == 'su') {
         message.success("尊贵的的管理员" + matchone.username + "恭喜您登录成功！");
     } else if (matchone.userstatus == 'ssu') {
@@ -175,6 +188,7 @@ onMounted(async () => {
 @mobile: ~"only screen and (max-width: 767px)";
 @tablet: ~"only screen and (min-width: 768px) and (max-width: 991px)";
 @desktop: ~"only screen and (min-width: 992px)";
+
 .loginform {
     width: 90vw;
     height: 85%;
@@ -182,8 +196,9 @@ onMounted(async () => {
     border-radius: 10px;
     padding: 5vh 3vw;
     margin: 0 auto;
+
     @media @desktop {
-        width:60vw;
+        width: 60vw;
     }
 }
 
@@ -224,17 +239,19 @@ onMounted(async () => {
 
 .crypto input {
     width: 30vw;
+
     @media @desktop {
-        width:15vw;
+        width: 15vw;
     }
-    
+
 }
 
 .crypto button {
     width: 40vw;
     height: 9vh;
+
     @media @desktop {
-        width:20vw;
+        width: 20vw;
     }
 
 }
@@ -251,4 +268,5 @@ onMounted(async () => {
     100% {
         font-size: 2.5em;
     }
-}</style>
+}
+</style>

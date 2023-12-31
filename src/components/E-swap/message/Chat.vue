@@ -103,6 +103,7 @@ onUnmounted(() => {
         padding:0.4em 0;
         .avater {
             img {
+                width:6vh;
                 height: 6vh;
                 border-radius: 50%;
             }

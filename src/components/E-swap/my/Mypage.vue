@@ -1,9 +1,13 @@
 <script setup>
 import { SettingOutlined } from "@ant-design/icons-vue"
 import Kingkong from "../index/Kingkong.vue";
-import {reactive,computed} from "vue"
+import {reactive,computed,onMounted} from "vue"
+import {useCommodityStore} from "@/stores/useCommodityStore"
 import {useUserStore} from "@/stores/userStore";
+import { useRouter } from "vue-router";
+const router = useRouter()
 const userStore = useUserStore()
+const commodityStore = useCommodityStore()
 
 const memberid=computed(()=>{
     const uid=userStore.userInfo.userid;
@@ -12,10 +16,10 @@ const memberid=computed(()=>{
     return  part1+"***"+part2;
 })
 const info1 = [
-    { altername: "收藏", count: 12 },
-    { altername: "历史浏览", count: 121 },
-    { altername: "关注", count: 28 },
-    { altername: "粉丝", count: 19 }
+    { altername: "收藏" },
+    { altername: "历史浏览"},
+    { altername: "关注" },
+    { altername: "粉丝" }
 ];
 const trades=[
     {icon:"https://afly0321.oss-cn-hangzhou.aliyuncs.com/img/t01.png",name:"我发布的"},
@@ -32,19 +36,44 @@ const kingkong=[
     {url:"https://afly0321.oss-cn-hangzhou.aliyuncs.com/img/e07.png",label:"红包奖券"},
     {url:"https://afly0321.oss-cn-hangzhou.aliyuncs.com/img/e08.png",label:"小易公益"},
 ]
+const showItem=(item)=>{
+    alert(item)
+}
+const tradeNums=(name)=>{
+    if(name=="我发布的"){
+        return name+" "+commodityStore.state.commodityList.filter(item=>item.userid==userStore.userInfo.userid).length;
+    }
+    else return name+" "+(4+Math.floor(Math.random()*15))
+}
+const getInfo1Count=(name)=>{
+    switch(name){
+        case "收藏":
+        return userStore.userInfo.collection.length;
+        case "关注":
+        return userStore.userInfo.focus.length;
+        case "粉丝":
+        return userStore.userInfo.fans.length;
+        case "历史浏览":
+        return userStore.historyScan.length;
+    }
+        
 
+}
+const goSetting=()=>{
+    router.push("/setting");
+}
 </script>
 
 <template>
     <div class="mypage">
         <div class="config">
-            <SettingOutlined />
+            <SettingOutlined @click="goSetting"/>
         </div>
         <div class="userinfo">
             <div class="avatar">
                 <a-avatar size="large">
                     <template #icon>
-                        <img v-lazy="'https://afly0321.oss-cn-hangzhou.aliyuncs.com/img/ikun.png'" />
+                        <img v-lazy="userStore.userInfo.avater"/>
                     </template>
                 </a-avatar>
             </div>
@@ -61,7 +90,7 @@ const kingkong=[
         <div class="info1">
             <div class="alter" v-for="item of info1">
                 <div class="count">
-                    {{ item.count }}
+                    {{ getInfo1Count(item.altername) }}
                 </div>
                 <div class="altername">
                     {{ item.altername }}
@@ -84,7 +113,7 @@ const kingkong=[
                         <img v-lazy="item.icon" />
                     </div>
                     <div class="tradetext">
-                        {{item.name}}&nbsp;{{ (5+Math.random()*20).toFixed(0) }}
+                        {{ tradeNums(item.name) }}
                     </div>
                 </div>
             </div>
@@ -95,7 +124,13 @@ const kingkong=[
                 更多服务
             </div>
             <div class="extraitems">
-                <Kingkong :items="kingkong" itemwidth="22vw"/>
+                <!-- <Kingkong :items="kingkong" itemwidth="22vw"/> -->
+                <div class="extraitem" v-for="item of kingkong" @click="showItem(item.label)">
+                    <div class="icon">
+                        <img v-lazy="item.url"/>
+                    </div>
+                    <div class="name">{{ item.label }}</div>
+                </div>
             </div>
         </div>
 
@@ -107,6 +142,23 @@ const kingkong=[
     width:100%;
     height:29vh;
     overflow-y: scroll;
+    display: grid;
+    grid-template-columns: repeat(4,1fr);
+    padding:1em 1em 0;
+    gap: 1em;
+    .extraitem{
+        .icon{
+            display: flex;
+            justify-content: center;
+        }
+        .name{
+            margin-top: 0.3em;
+        }
+
+        img{
+            width:60%;
+        }
+    }
 }
 .extra .title{
     font-size: 1.2em;
@@ -114,8 +166,8 @@ const kingkong=[
     margin-left: 1em;
 }
 .tradeinfo{
-    display: flex;
-    justify-content: space-around;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
     margin-top: 1em;
 }
 .tradealter {

@@ -2,7 +2,7 @@
 import { useCartStore } from "@/stores/useCartStore"
 import Counter from "./Counter.vue"
 const cartStore = useCartStore();
-const props=defineProps(["item","operable"]);
+const props=defineProps(["item","operable","countable"]);
 
 const addToCart = (item) => {
     cartStore.addToCart(item);
@@ -35,13 +35,21 @@ const removeFromCart = (item) => {
             </div>
         </div>
 
-        <div class="operation" v-if="props.operable??true">
+        <div class="operation" v-if="props.operable??false">
             <Counter :count="item.count" @do-add="addToCart(item)" @do-minus="removeFromCart(item)" />
+        </div>
+        <div class="count" v-if="props.countable??false">
+            x{{ item.count }}
         </div>
     </div>
 </template>
 
 <style scoped lang="less">
+.count{
+    font-size: 1.3em;
+    text-align: right;
+    padding-right: 1em;
+}
 .operation {
     display: flex;
     justify-content: center;
@@ -64,8 +72,8 @@ const removeFromCart = (item) => {
 }
 
 .itemcontent {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 3fr 2fr;
     height: 12vh;
     align-items: center;
     border-bottom: 1px solid rgb(239, 239, 239);

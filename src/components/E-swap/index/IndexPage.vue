@@ -6,11 +6,13 @@ import Kingkong from "./Kingkong.vue";
 import Capsule from "./Capsule.vue";
 import { CloseOutlined, AimOutlined } from "@ant-design/icons-vue"
 import { useCommodityStore } from "@/stores/useCommodityStore"
+import { useUserStore } from "@/stores/userStore"
 import { doQuery } from "@/functions/mysql"
 import { useRouter, useRoute } from "vue-router"
 import Location from "./Location.vue";
 const router = useRouter()
 const route = useRoute();
+const userStore = useUserStore();
 const commodityStore = useCommodityStore()
 
 const state = reactive({
@@ -18,7 +20,7 @@ const state = reactive({
     xcimgs: [],
     showTags: false,
     xtags: ["乒乓球", "台球", "BJD娃娃", "垂钓", "今日降价", "民族乐器", "手风琴", "皮包", "汽车养护", "足球", "跑步装备", "穿搭", "电脑零件", "桌游", "电动车"],
-    plustags: ["香水", "电子琴", "吉他", "健身", "汉服", "阅读", "配饰", "化妆品", "JK制服", "影音", "收纳", "Cosplay"]
+    plustags: ["香水", "电子琴", "吉他", "健身", "汉服", "阅读", "配饰", "化妆品", "JK制服", "影音", "收纳", "Cosplay"],
 
 })
 const imgs = [
@@ -56,9 +58,10 @@ onMounted(async () => {
     }
     await searchByCategory();
 })
+
 const getCommoditys = async () => {
     let p = {};
-    p.selectsql = "select id,name,price,image,category,brand,userid,avater from commodity2 order by rowno limit 100";
+    p.sqlprocedure="demox008";
     await doQuery(p).then((res) => {
         state.cimgs = [...res.data];
         commodityStore.state.commodityList = [...res.data];
