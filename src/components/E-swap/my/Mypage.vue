@@ -153,6 +153,8 @@ const goSetting=()=>{
         }
         .name{
             margin-top: 0.3em;
+            display: flex;
+            justify-content: center;
         }
 
         img{

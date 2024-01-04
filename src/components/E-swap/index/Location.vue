@@ -1,12 +1,13 @@
 <script setup>
 import { CloseOutlined, AimOutlined,EnvironmentOutlined,PayCircleOutlined} from "@ant-design/icons-vue"
-import {computed} from "vue"
+import {computed,onMounted} from "vue"
 const props=defineProps(["width","fontsize","borderradius","bgColor","color"])
 let width=computed(()=>props.width??"100%")
 let fontsize=computed(()=>props.fontsize??"16px")
 let borderradius=computed(()=>props.borderradius??"5px")
 let bgColor=computed(()=>props.bgColor??"#575757a9")
 let color=computed(()=>props.color??"#ffffff")
+
 </script>
 
 <template>

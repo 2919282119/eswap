@@ -39,6 +39,7 @@ const midtext = ['个人资料设置', '地址管理', '支付管理', '账号�
 const bottomtext = ['新消息通知', '所有宝贝自动回复', '消息提示音设置', '隐私', '清除缓存'];
 const exittext = '退出登录';
 import { useUserStore } from "@/stores/userStore"
+import { onMounted } from 'vue';
 const userStore = useUserStore();
 const goLogin = () => {
     router.push('/login');
@@ -54,6 +55,7 @@ const goLogin = () => {
 const goback = () => {
     router.go(-1);
 }
+
 </script>
 <style lang="less">
 .outclass {
